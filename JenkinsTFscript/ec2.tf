@@ -6,8 +6,8 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket = "asher-jenkins"
-    key    = "meenah.tfstate"
+    bucket = "ashed-jenkins"
+    key    = "dennis.tfstate"
     region = "us-east-1"
   }
 }
