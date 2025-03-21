@@ -7,7 +7,7 @@ provider "aws" {
 
 
 resource "aws_s3_bucket" "example" {
-  bucket = "dennis-bucketid"
+  bucket = "asher-jenkins"
 
   lifecycle {
     prevent_destroy = true
