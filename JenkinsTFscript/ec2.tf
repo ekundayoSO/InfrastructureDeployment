@@ -4,6 +4,14 @@ provider "aws" {
   profile   = "Dennis"
 }
 
+terraform {
+  backend "s3" {
+    bucket = "asher-jenkins"
+    key    = "meenah.tfstate"
+    region = "us-east-1"
+  }
+}
+
 
 # create default vpc if one does not exit
 resource "aws_default_vpc" "default_vpc" {
@@ -89,8 +97,8 @@ resource "aws_instance" "ec2_instance" {
   instance_type          = "t2.small"
   subnet_id              = aws_default_subnet.default_az1.id
   vpc_security_group_ids = [aws_security_group.ec2_security_group.id]
-  key_name               = "LPkp"
-  # user_data = "${file("install_jenkins.sh")}"
+  key_name               = "devopskeypair"
+  user_data = "${file("install_jenkins.sh")}"
 
   tags = {
     Name = "jenkins_server"
@@ -99,33 +107,33 @@ resource "aws_instance" "ec2_instance" {
 
 
 # an empty resource block
-resource "null_resource" "name" {
+# resource "null_resource" "name" {
 
-  # ssh into the ec2 instance 
-  connection {
-    type        = "ssh"
-    user        = "ubuntu"
-    private_key = file("~/Downloads/LPkp.pem")
-    host        = aws_instance.ec2_instance.public_ip
-  }
+#   # ssh into the ec2 instance 
+#   connection {
+#     type        = "ssh"
+#     user        = "ubuntu"
+#     private_key = file("~/Downloads/devopskeypair.pem")
+#     host        = aws_instance.ec2_instance.public_ip
+#   }
 
-  # copy the install_jenkins.sh file from your computer to the ec2 instance 
-  provisioner "file" {
-    source      = "install_jenkins.sh"
-    destination = "/tmp/install_jenkins.sh"
-  }
+#   # copy the install_jenkins.sh file from your computer to the ec2 instance 
+#   provisioner "file" {
+#     source      = "install_jenkins.sh"
+#     destination = "/tmp/install_jenkins.sh"
+#   }
 
-  # set permissions and run the install_jenkins.sh file
-  provisioner "remote-exec" {
-    inline = [
-        "sudo chmod +x /tmp/install_jenkins.sh",
-        "sh /tmp/install_jenkins.sh",
-    ]
-  }
+#   # set permissions and run the install_jenkins.sh file
+#   provisioner "remote-exec" {
+#     inline = [
+#         "sudo chmod +x /tmp/install_jenkins.sh",
+#         "sh /tmp/install_jenkins.sh",
+#     ]
+#   }
 
-  # wait for ec2 to be created
-  depends_on = [aws_instance.ec2_instance]
-}
+#   # wait for ec2 to be created
+#   depends_on = [aws_instance.ec2_instance]
+# }
 
 
 # print the url of the jenkins server
