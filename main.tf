@@ -99,7 +99,7 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
   ip_protocol       = "-1" # semantically equivalent to all ports
 }
 resource "aws_instance" "foo" {
-  ami           = "ami-04b70fa74e45c3917" # us-west-2
+  ami           = "ami-084568db4383264d4" # us-west-1
   instance_type = "t2.micro"
   subnet_id = aws_subnet.demo_subnet.id
   vpc_security_group_ids = [aws_security_group.allow_tls.id]
