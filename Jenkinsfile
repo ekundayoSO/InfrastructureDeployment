@@ -6,10 +6,6 @@ pipeline {
         }
     }
 
-    parameters {
-        choice(name: 'action', choices: ['apply', 'destroy'], description: 'Choose Terraform action')
-    }
-
     environment {
         AWS_ACCOUNT_ID      = credentials('account_id')
         AWS_DEFAULT_REGION  = 'us-east-1'
@@ -24,7 +20,7 @@ pipeline {
                     sh 'terraform init'
                     sh 'terraform validate'
                     sh 'terraform plan'
-                    sh "terraform ${params.action} --auto-approve"
+                    sh "terraform ${action} --auto-approve"
                 }
             }
         }
