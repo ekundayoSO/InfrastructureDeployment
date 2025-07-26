@@ -1,11 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'hashicorp/terraform:light'
-            args '-v $HOME/.aws:/root/.aws' // optional: mount AWS credentials if needed
-        }
-    }
-
+    agent any
     environment {
         AWS_ACCOUNT_ID      = credentials('account_id')
         AWS_DEFAULT_REGION  = 'us-east-1'
@@ -14,6 +8,12 @@ pipeline {
     }
 
     stages {
+         stage('Infrastructure Deployment') {
+            agent {
+                docker {
+                    image 'hashicorp/terraform:light'
+                }
+            }
         stage('Infrastructure Deployment') {
             steps {
                 script {
