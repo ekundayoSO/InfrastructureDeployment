@@ -1,40 +1,30 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'hashicorp/terraform:light'
+            args '-v $HOME/.aws:/root/.aws' // optional: mount AWS credentials if needed
+        }
+    }
 
     parameters {
-        choice(name: 'TERRAFORM_ACTION', choices: ['apply', 'destroy'], description: 'Choose Terraform action to run')
+        choice(name: 'action', choices: ['apply', 'destroy'], description: 'Choose Terraform action')
     }
 
     environment {
-        AWS_ACCESS_KEY_ID     = credentials('aws_access_key_id')
+        AWS_ACCOUNT_ID      = credentials('account_id')
+        AWS_DEFAULT_REGION  = 'us-east-1'
+        AWS_ACCESS_KEY_ID   = credentials('aws_access_key_id')
         AWS_SECRET_ACCESS_KEY = credentials('aws_secret_access_key')
-        AWS_DEFAULT_REGION    = 'us-east-1'
-        AWS_KEYPAIR_NAME      = credentials('aws_keypair_name')
     }
 
     stages {
-        stage('Git Checkout') {
-            steps {
-                git 'https://github.com/ekundayoSO/InfrastructureDeployment.git'
-            }
-        }
-
-        stage('Terraform Init') {
-            steps {
-                sh 'terraform init'
-                sh 'terraform validate'
-                sh 'terraform plan -var="key_name=${AWS_KEYPAIR_NAME}"'
-            }
-        }
-
-        stage('Terraform ${params.TERRAFORM_ACTION}') {
+        stage('Infrastructure Deployment') {
             steps {
                 script {
-                    if (params.TERRAFORM_ACTION == 'apply' || params.TERRAFORM_ACTION == 'destroy') {
-                        sh "terraform ${params.TERRAFORM_ACTION} -auto-approve -var=\"key_name=${AWS_KEYPAIR_NAME}\""
-                    } else {
-                        error "Invalid Terraform action: ${params.TERRAFORM_ACTION}"
-                    }
+                    sh 'terraform init'
+                    sh 'terraform validate'
+                    sh 'terraform plan'
+                    sh "terraform ${params.action} --auto-approve"
                 }
             }
         }
