@@ -1,0 +1,6 @@
+README-credentials.md
+.terraform-version
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup   
+.terraform
